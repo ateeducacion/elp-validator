@@ -5,6 +5,21 @@
     const resultsSection = document.getElementById('results');
     const fileNameElement = document.getElementById('fileName');
     const checklist = document.getElementById('checklist');
+    const metadataSection = document.getElementById('packageMetadata');
+    const metadataFields = {
+        title: document.getElementById('meta-title'),
+        author: document.getElementById('meta-author'),
+        language: document.getElementById('meta-language'),
+        description: document.getElementById('meta-description'),
+        license: document.getElementById('meta-license'),
+        version: document.getElementById('meta-version'),
+        identifier: document.getElementById('meta-identifier')
+    };
+    const metadataMore = document.getElementById('metadataMore');
+    const metadataPropertiesList = document.getElementById('meta-properties');
+    const metadataResourcesList = document.getElementById('meta-resources');
+    const metadataPropertiesSection = document.getElementById('meta-properties-section');
+    const metadataResourcesSection = document.getElementById('meta-resources-section');
 
     if (!dropzone || !fileInput || !checklist) {
         console.error('The validator UI elements are missing.');
@@ -17,6 +32,33 @@
         warning: '⚠️',
         error: '❌'
     };
+
+    function clearMetadata() {
+        if (metadataSection) {
+            metadataSection.hidden = true;
+        }
+        Object.values(metadataFields).forEach((field) => {
+            if (field) {
+                field.textContent = '—';
+            }
+        });
+        if (metadataMore) {
+            metadataMore.hidden = true;
+            metadataMore.open = false;
+        }
+        if (metadataPropertiesList) {
+            metadataPropertiesList.innerHTML = '';
+        }
+        if (metadataResourcesList) {
+            metadataResourcesList.innerHTML = '';
+        }
+        if (metadataPropertiesSection) {
+            metadataPropertiesSection.style.display = 'none';
+        }
+        if (metadataResourcesSection) {
+            metadataResourcesSection.style.display = 'none';
+        }
+    }
 
     function resetChecklist() {
         const items = checklist.querySelectorAll('.check-item');
@@ -37,6 +79,87 @@
                 details.style.display = 'none';
             }
         });
+    }
+
+    function populateKeyValueList(container, entries) {
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = '';
+        entries.forEach(([key, value]) => {
+            const item = document.createElement('li');
+            const keyElement = document.createElement('code');
+            keyElement.textContent = key;
+            const valueElement = document.createElement('span');
+            valueElement.className = 'metadata-value';
+            valueElement.textContent = value || '—';
+            item.appendChild(keyElement);
+            item.appendChild(document.createTextNode(': '));
+            item.appendChild(valueElement);
+            container.appendChild(item);
+        });
+    }
+
+    function renderMetadata(metadata) {
+        if (!metadataSection || !metadata) {
+            return;
+        }
+
+        const properties = metadata.properties || {};
+        const resources = metadata.resources || {};
+        const hasMetadata = Object.keys(properties).length > 0 || Object.keys(resources).length > 0;
+
+        if (!hasMetadata) {
+            metadataSection.hidden = true;
+            if (metadataMore) {
+                metadataMore.hidden = true;
+            }
+            return;
+        }
+
+        const fieldValues = {
+            title: properties.pp_title || properties.title || '',
+            author: properties.pp_author || '',
+            language: properties.pp_lang || properties.language || '',
+            description: properties.pp_description || '',
+            license: properties.license || '',
+            version: resources.odeVersionName || properties.version || '',
+            identifier: resources.odeId || resources.odeVersionId || ''
+        };
+
+        Object.entries(fieldValues).forEach(([key, value]) => {
+            const field = metadataFields[key];
+            if (field) {
+                field.textContent = value || '—';
+            }
+        });
+
+        const primaryPropertyKeys = new Set(['pp_title', 'pp_author', 'pp_lang', 'pp_description', 'license', 'title', 'language', 'version']);
+        const primaryResourceKeys = new Set(['odeVersionName', 'odeId', 'odeVersionId']);
+
+        const extraPropertyEntries = Object.entries(properties).filter(([key]) => !primaryPropertyKeys.has(key));
+        const extraResourceEntries = Object.entries(resources).filter(([key]) => !primaryResourceKeys.has(key));
+
+        if (metadataPropertiesSection) {
+            metadataPropertiesSection.style.display = extraPropertyEntries.length > 0 ? '' : 'none';
+        }
+        if (metadataResourcesSection) {
+            metadataResourcesSection.style.display = extraResourceEntries.length > 0 ? '' : 'none';
+        }
+
+        populateKeyValueList(metadataPropertiesList, extraPropertyEntries);
+        populateKeyValueList(metadataResourcesList, extraResourceEntries);
+
+        if (metadataMore) {
+            const hasExtra = extraPropertyEntries.length > 0 || extraResourceEntries.length > 0;
+            metadataMore.hidden = !hasExtra;
+            if (!hasExtra) {
+                metadataMore.open = false;
+            }
+        }
+
+        metadataSection.hidden = false;
     }
 
     function setChecklistStatus(id, status, message) {
@@ -73,6 +196,7 @@
 
         resultsSection.hidden = false;
         fileNameElement.textContent = file.name;
+        clearMetadata();
         resetChecklist();
 
         let zip;
@@ -125,6 +249,10 @@
         setChecklistStatus('check-xml-well-formed', 'success', 'content.xml is well-formed.');
 
         const xmlDoc = parseResult.document;
+        const metadata = validator.extractMetadata ? validator.extractMetadata(xmlDoc) : null;
+        if (metadata) {
+            renderMetadata(metadata);
+        }
         const rootResult = validator.checkRootElement(xmlDoc);
         setChecklistStatus('check-root-element', rootResult.status, rootResult.message);
         if (rootResult.status === 'error') {

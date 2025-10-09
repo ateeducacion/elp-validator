@@ -5,7 +5,11 @@
         global.ELPValidator = factory();
     }
 })(typeof self !== 'undefined' ? self : this, function () {
-    const REQUIRED_NAV_FIELDS = ['odePageId', 'pageName', 'odeNavStructureSyncOrder'];
+    const REQUIRED_NAV_FIELDS = [
+        'odePageId',
+        'pageName',
+        ['odeNavStructureSyncOrder', 'odeNavStructureOrder']
+    ];
     const REQUIRED_BLOCK_FIELDS = ['odeBlockId', 'blockName'];
     const REQUIRED_COMPONENT_FIELDS = ['odeIdeviceId', 'odeIdeviceTypeName', 'htmlView', 'jsonProperties'];
 
@@ -67,11 +71,17 @@
         return { status: 'success', message: `Found ${pages.length} page${pages.length === 1 ? '' : 's'}.` };
     }
 
+    function formatRequirement(requirement) {
+        return Array.isArray(requirement) ? requirement.join(' / ') : requirement;
+    }
+
     function ensureChildTags(node, requiredTags) {
         const missing = [];
-        requiredTags.forEach((tag) => {
-            if (!node.getElementsByTagName(tag)[0]) {
-                missing.push(tag);
+        requiredTags.forEach((requirement) => {
+            const tags = Array.isArray(requirement) ? requirement : [requirement];
+            const hasAny = tags.some((tag) => node.getElementsByTagName(tag)[0]);
+            if (!hasAny) {
+                missing.push(formatRequirement(requirement));
             }
         });
         return missing;
@@ -201,6 +211,40 @@
         return missing;
     }
 
+    function extractMetadata(xmlDoc) {
+        const metadata = { properties: {}, resources: {} };
+
+        const propertyNodes = Array.from(xmlDoc.getElementsByTagName('odeProperty'));
+        propertyNodes.forEach((property) => {
+            const keyNode = property.getElementsByTagName('key')[0];
+            if (!keyNode || !keyNode.textContent) {
+                return;
+            }
+            const valueNode = property.getElementsByTagName('value')[0];
+            const key = keyNode.textContent.trim();
+            const value = valueNode && valueNode.textContent ? valueNode.textContent.trim() : '';
+            if (key) {
+                metadata.properties[key] = value;
+            }
+        });
+
+        const resourceNodes = Array.from(xmlDoc.getElementsByTagName('odeResource'));
+        resourceNodes.forEach((resource) => {
+            const keyNode = resource.getElementsByTagName('key')[0];
+            if (!keyNode || !keyNode.textContent) {
+                return;
+            }
+            const valueNode = resource.getElementsByTagName('value')[0];
+            const key = keyNode.textContent.trim();
+            const value = valueNode && valueNode.textContent ? valueNode.textContent.trim() : '';
+            if (key) {
+                metadata.resources[key] = value;
+            }
+        });
+
+        return metadata;
+    }
+
     return {
         parseContentXml,
         checkRootElement,
@@ -209,6 +253,7 @@
         validateStructuralIntegrity,
         extractResourcePaths,
         findMissingResources,
-        normalizeResourcePath
+        normalizeResourcePath,
+        extractMetadata
     };
 });

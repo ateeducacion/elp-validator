@@ -101,6 +101,101 @@ main {
     color: var(--color-muted);
 }
 
+.metadata {
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    border-radius: 18px;
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.metadata h3 {
+    margin: 0 0 1rem;
+    font-size: 1.15rem;
+}
+
+.metadata-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.metadata-table th {
+    text-align: left;
+    padding: 0.35rem 0;
+    color: var(--color-muted);
+    font-weight: 600;
+    width: 160px;
+}
+
+.metadata-table td {
+    padding: 0.35rem 0;
+    word-break: break-word;
+}
+
+.metadata-more {
+    margin-top: 1rem;
+}
+
+.metadata-more summary {
+    cursor: pointer;
+    color: var(--color-pending);
+    font-weight: 600;
+    outline: none;
+}
+
+.metadata-more summary::marker {
+    color: var(--color-pending);
+}
+
+.metadata-more-content {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .metadata-more-content {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.metadata-more-section h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.metadata-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.metadata-list li {
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.metadata-list code {
+    background: rgba(99, 102, 241, 0.15);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.85rem;
+}
+
+.metadata-value {
+    color: var(--color-text);
+}
+
 .file-name {
     margin: 0 0 0.5rem;
     font-size: 1.2rem;

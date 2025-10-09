@@ -6,17 +6,18 @@ const {
     validateStructuralIntegrity,
     extractResourcePaths,
     findMissingResources,
-    normalizeResourcePath
+    normalizeResourcePath,
+    extractMetadata
 } = require('../js/validator');
 
 describe('ELP Validator helpers', () => {
     const minimalXml = `<?xml version="1.0"?>
     <ode>
         <odeNavStructures>
-            <odeNavStructure>
+                <odeNavStructure>
                 <odePageId>p1</odePageId>
                 <pageName>Start</pageName>
-                <odeNavStructureSyncOrder>1</odeNavStructureSyncOrder>
+                <odeNavStructureOrder>1</odeNavStructureOrder>
                 <odePagStructures>
                     <odePagStructure>
                         <odeBlockId>b1</odeBlockId>
@@ -104,6 +105,33 @@ describe('ELP Validator helpers', () => {
         const { document } = parseContentXml(minimalXml);
         const result = validateStructuralIntegrity(document);
         expect(result.status).toBe('success');
+    });
+
+    test('extractMetadata returns properties and resources maps', () => {
+        const xml = `<?xml version="1.0"?>
+            <ode>
+                <odeProperties>
+                    <odeProperty>
+                        <key>pp_title</key>
+                        <value>Sample title</value>
+                    </odeProperty>
+                    <odeProperty>
+                        <key>pp_author</key>
+                        <value>Author Name</value>
+                    </odeProperty>
+                </odeProperties>
+                <odeResources>
+                    <odeResource>
+                        <key>odeVersionId</key>
+                        <value>123</value>
+                    </odeResource>
+                </odeResources>
+            </ode>`;
+        const { document } = parseContentXml(xml);
+        const metadata = extractMetadata(document);
+        expect(metadata.properties.pp_title).toBe('Sample title');
+        expect(metadata.properties.pp_author).toBe('Author Name');
+        expect(metadata.resources.odeVersionId).toBe('123');
     });
 
     test('extractResourcePaths finds HTML and JSON references', () => {

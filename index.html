@@ -27,6 +27,54 @@
 
         <section id="results" class="card results" hidden>
             <h2 id="fileName" class="file-name"></h2>
+            <div id="packageMetadata" class="metadata" hidden>
+                <h3>Package details</h3>
+                <table class="metadata-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Title</th>
+                            <td id="meta-title">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Author</th>
+                            <td id="meta-author">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Language</th>
+                            <td id="meta-language">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Description</th>
+                            <td id="meta-description">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">License</th>
+                            <td id="meta-license">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Version</th>
+                            <td id="meta-version">—</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Identifier</th>
+                            <td id="meta-identifier">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <details id="metadataMore" class="metadata-more" hidden>
+                    <summary>Show raw metadata</summary>
+                    <div class="metadata-more-content">
+                        <div class="metadata-more-section" id="meta-properties-section">
+                            <h4>Properties</h4>
+                            <ul id="meta-properties" class="metadata-list"></ul>
+                        </div>
+                        <div class="metadata-more-section" id="meta-resources-section">
+                            <h4>Resources</h4>
+                            <ul id="meta-resources" class="metadata-list"></ul>
+                        </div>
+                    </div>
+                </details>
+            </div>
             <p class="results-intro">Validation results:</p>
             <ul id="checklist" class="checklist">
                 <li id="check-zip" class="check-item pending" data-label="Verifying ZIP archive integrity">
