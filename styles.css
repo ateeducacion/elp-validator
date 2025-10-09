@@ -298,6 +298,17 @@ main {
     margin-top: 0.4rem;
 }
 
+.app-footer .credits {
+    margin-top: 0.6rem;
+    font-weight: 500;
+}
+
+.app-footer .credits a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+}
+
 @media (max-width: 640px) {
     .card {
         padding: 1.75rem;
