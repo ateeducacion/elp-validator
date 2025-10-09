@@ -245,6 +245,144 @@
         return metadata;
     }
 
+    function extractLegacyMetadata(xmlDoc) {
+        if (!xmlDoc || !xmlDoc.documentElement) {
+            return null;
+        }
+
+        const metadata = { properties: {}, resources: {} };
+        const root = xmlDoc.documentElement;
+        const topDictionary = findFirstChildByLocalName(root, 'dictionary');
+
+        if (!topDictionary) {
+            return metadata;
+        }
+
+        metadata.properties = extractLegacyDictionary(topDictionary);
+
+        const version = root.getAttribute('version');
+        if (version) {
+            metadata.properties.legacy_manifest_version = version;
+        }
+
+        const legacyClass = root.getAttribute('class');
+        if (legacyClass) {
+            metadata.properties.legacy_manifest_class = legacyClass;
+        }
+
+        return metadata;
+    }
+
+    function normalizeLegacyMetadata(metadata) {
+        if (!metadata) {
+            return null;
+        }
+
+        const normalized = {
+            properties: {},
+            resources: { ...(metadata.resources || {}) }
+        };
+
+        const properties = { ...(metadata.properties || {}) };
+
+        if (properties._title && !properties.pp_title) {
+            properties.pp_title = properties._title;
+        }
+        if (properties._author && !properties.pp_author) {
+            properties.pp_author = properties._author;
+        }
+        if (properties._lang && !properties.pp_lang) {
+            properties.pp_lang = properties._lang;
+        }
+        if (properties._description && !properties.pp_description) {
+            properties.pp_description = properties._description;
+        }
+        if (properties._newlicense && !properties.license) {
+            properties.license = properties._newlicense;
+        }
+
+        normalized.properties = properties;
+        return normalized;
+    }
+
+    function findFirstChildByLocalName(node, localName) {
+        if (!node || !node.children) {
+            return null;
+        }
+        return Array.from(node.children).find((child) => child.localName === localName);
+    }
+
+    function extractLegacyDictionary(dictionaryNode) {
+        const result = {};
+        if (!dictionaryNode || !dictionaryNode.children) {
+            return result;
+        }
+
+        const children = Array.from(dictionaryNode.children);
+        for (let index = 0; index < children.length; index += 1) {
+            const child = children[index];
+            if (!child.getAttribute) {
+                continue;
+            }
+            const role = child.getAttribute('role');
+            if (role !== 'key') {
+                continue;
+            }
+
+            const key = child.getAttribute('value') || child.textContent || '';
+            if (!key) {
+                continue;
+            }
+
+            const valueNode = children[index + 1];
+            if (valueNode) {
+                result[key] = extractLegacyValue(valueNode);
+                index += 1;
+            }
+        }
+
+        return result;
+    }
+
+    function extractLegacyInstance(instanceNode) {
+        if (!instanceNode || !instanceNode.children) {
+            return {};
+        }
+
+        const dictionary = findFirstChildByLocalName(instanceNode, 'dictionary');
+        return dictionary ? extractLegacyDictionary(dictionary) : {};
+    }
+
+    function extractLegacyList(listNode) {
+        if (!listNode || !listNode.children) {
+            return [];
+        }
+        return Array.from(listNode.children).map((child) => extractLegacyValue(child));
+    }
+
+    function extractLegacyValue(node) {
+        if (!node) {
+            return '';
+        }
+
+        const name = node.localName || node.tagName;
+        switch (name) {
+            case 'unicode':
+            case 'string':
+            case 'bool':
+            case 'int':
+                return node.getAttribute('value') ?? (node.textContent || '');
+            case 'list':
+                return extractLegacyList(node);
+            case 'dictionary':
+                return extractLegacyDictionary(node);
+            case 'instance':
+                return extractLegacyInstance(node);
+            default:
+                return node.textContent || '';
+        }
+    }
+
     return {
         parseContentXml,
         checkRootElement,
@@ -254,6 +392,8 @@
         extractResourcePaths,
         findMissingResources,
         normalizeResourcePath,
-        extractMetadata
+        extractMetadata,
+        extractLegacyMetadata,
+        normalizeLegacyMetadata
     };
 });

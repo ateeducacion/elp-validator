@@ -7,7 +7,9 @@ const {
     extractResourcePaths,
     findMissingResources,
     normalizeResourcePath,
-    extractMetadata
+    extractMetadata,
+    extractLegacyMetadata,
+    normalizeLegacyMetadata
 } = require('../js/validator');
 
 describe('ELP Validator helpers', () => {
@@ -162,5 +164,43 @@ describe('ELP Validator helpers', () => {
     test('normalizeResourcePath cleans relative and encoded paths', () => {
         expect(normalizeResourcePath('./content/My%20File.png')).toBe('content/My File.png');
         expect(normalizeResourcePath('/custom\\file.txt')).toBe('custom/file.txt');
+    });
+
+    test('extractLegacyMetadata reads key/value pairs from legacy manifests', () => {
+        const legacyXml = `<?xml version="1.0"?>
+            <instance xmlns="http://www.exelearning.org/content/v0.3" version="0.3" class="exe.engine.package.Package">
+                <dictionary>
+                    <string role="key" value="_title"></string>
+                    <unicode value="Legacy Title"></unicode>
+                    <string role="key" value="_author"></string>
+                    <unicode value="Legacy Author"></unicode>
+                    <string role="key" value="_lang"></string>
+                    <unicode value="es"></unicode>
+                </dictionary>
+            </instance>`;
+        const { document } = parseContentXml(legacyXml);
+        const metadata = extractLegacyMetadata(document);
+        expect(metadata.properties._title).toBe('Legacy Title');
+        expect(metadata.properties._author).toBe('Legacy Author');
+        expect(metadata.properties.legacy_manifest_version).toBe('0.3');
+    });
+
+    test('normalizeLegacyMetadata maps legacy keys to modern equivalents', () => {
+        const legacy = {
+            properties: {
+                _title: 'Legacy Title',
+                _author: 'Legacy Author',
+                _lang: 'es',
+                _description: 'Legacy description',
+                _newlicense: 'CC BY-SA'
+            },
+            resources: {}
+        };
+        const normalized = normalizeLegacyMetadata(legacy);
+        expect(normalized.properties.pp_title).toBe('Legacy Title');
+        expect(normalized.properties.pp_author).toBe('Legacy Author');
+        expect(normalized.properties.pp_lang).toBe('es');
+        expect(normalized.properties.pp_description).toBe('Legacy description');
+        expect(normalized.properties.license).toBe('CC BY-SA');
     });
 });

@@ -7,12 +7,12 @@ A client-side web application that inspects `.elp` (ZIP) packages exported from 
 - Drag-and-drop interface for `.elp` or `.zip` archives.
 - In-browser decompression using [JSZip](https://stuk.github.io/jszip/).
 - Sequential checklist that validates:
-  - Archive integrity and presence of `content.xml`.
+  - Archive integrity and presence of the manifest (`content.xml` or legacy `contentv3.xml`).
   - Recommended resource directories (`content/`, `custom/`).
 - XML well-formedness and root `<ode>` element.
 - Navigation structure, page presence, and mandatory node fields.
 - Referenced resources inside `htmlView` and `jsonProperties` blocks.
-- A package details panel that surfaces title, author, language, license, and other metadata extracted from `content.xml`.
+- A package details panel that surfaces title, author, language, license, and other metadata from modern and legacy manifests.
 - No server required — all processing happens locally in the browser.
 
 ## Getting Started

@@ -194,6 +194,7 @@ main {
 
 .metadata-value {
     color: var(--color-text);
+    white-space: pre-wrap;
 }
 
 .file-name {

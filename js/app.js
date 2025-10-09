@@ -93,7 +93,17 @@
             keyElement.textContent = key;
             const valueElement = document.createElement('span');
             valueElement.className = 'metadata-value';
-            valueElement.textContent = value || '—';
+            let displayValue = value;
+            if (displayValue === null || displayValue === undefined || displayValue === '') {
+                displayValue = '—';
+            } else if (typeof displayValue === 'object') {
+                try {
+                    displayValue = JSON.stringify(displayValue, null, 2);
+                } catch (error) {
+                    displayValue = String(displayValue);
+                }
+            }
+            valueElement.textContent = displayValue;
             item.appendChild(keyElement);
             item.appendChild(document.createTextNode(': '));
             item.appendChild(valueElement);
@@ -200,6 +210,8 @@
         resetChecklist();
 
         let zip;
+        let manifestName = 'content.xml';
+        let manifestKind = 'modern';
         try {
             const arrayBuffer = await file.arrayBuffer();
             zip = await JSZip.loadAsync(arrayBuffer);
@@ -210,12 +222,28 @@
             return;
         }
 
-        const contentFile = zip.file('content.xml');
-        if (!contentFile) {
-            setChecklistStatus('check-content-xml', 'error', 'content.xml was not found in the archive.');
-            return;
+        let manifestFile = zip.file('content.xml');
+        if (!manifestFile) {
+            manifestFile = zip.file('contentv3.xml');
+            if (manifestFile) {
+                manifestName = 'contentv3.xml';
+                manifestKind = 'legacy';
+                setChecklistStatus(
+                    'check-content-xml',
+                    'warning',
+                    'content.xml is missing, but legacy contentv3.xml was found. This package was created with an eXeLearning version earlier than 3.0.'
+                );
+            } else {
+                setChecklistStatus(
+                    'check-content-xml',
+                    'error',
+                    'Neither content.xml nor legacy contentv3.xml were found. This package is not compatible with modern eXeLearning releases.'
+                );
+                return;
+            }
+        } else {
+            setChecklistStatus('check-content-xml', 'success', 'Found content.xml in the package.');
         }
-        setChecklistStatus('check-content-xml', 'success', 'Found content.xml in the package.');
 
         const hasContentResources = Object.keys(zip.files).some((name) => name.startsWith('content/'));
         const hasCustomFiles = Object.keys(zip.files).some((name) => name.startsWith('custom/'));
@@ -234,10 +262,10 @@
 
         let xmlString = '';
         try {
-            xmlString = await contentFile.async('string');
+            xmlString = await manifestFile.async('string');
         } catch (error) {
             console.error(error);
-            setChecklistStatus('check-xml-well-formed', 'error', 'Unable to read content.xml from the archive.');
+            setChecklistStatus('check-xml-well-formed', 'error', `Unable to read ${manifestName} from the archive.`);
             return;
         }
 
@@ -246,13 +274,39 @@
             setChecklistStatus('check-xml-well-formed', 'error', parseResult.message);
             return;
         }
-        setChecklistStatus('check-xml-well-formed', 'success', 'content.xml is well-formed.');
+        setChecklistStatus('check-xml-well-formed', 'success', `${manifestName} is well-formed.`);
 
         const xmlDoc = parseResult.document;
-        const metadata = validator.extractMetadata ? validator.extractMetadata(xmlDoc) : null;
+        const metadata =
+            manifestKind === 'legacy'
+                ? validator.normalizeLegacyMetadata?.(validator.extractLegacyMetadata?.(xmlDoc))
+                : validator.extractMetadata?.(xmlDoc);
         if (metadata) {
             renderMetadata(metadata);
         }
+
+        if (manifestKind === 'legacy') {
+            setChecklistStatus(
+                'check-root-element',
+                'warning',
+                'Legacy manifest format detected (<instance>). Structural validation checks for modern packages were skipped.'
+            );
+            const skippedMessage = 'Skipped: legacy eXeLearning manifests (contentv3.xml) do not expose modern navigation structures.';
+            setChecklistStatus('check-nav-structures', 'warning', skippedMessage);
+            setChecklistStatus('check-pages', 'warning', skippedMessage);
+            setChecklistStatus(
+                'check-structure',
+                'warning',
+                'Skipped: legacy manifest layout is incompatible with the structural integrity rules used for modern packages.'
+            );
+            setChecklistStatus(
+                'check-resources',
+                'warning',
+                'Resource validation is unavailable for legacy manifests. Inspect the package contents manually if needed.'
+            );
+            return;
+        }
+
         const rootResult = validator.checkRootElement(xmlDoc);
         setChecklistStatus('check-root-element', rootResult.status, rootResult.message);
         if (rootResult.status === 'error') {
