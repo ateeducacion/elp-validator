@@ -13,7 +13,8 @@
         description: document.getElementById('meta-description'),
         license: document.getElementById('meta-license'),
         version: document.getElementById('meta-version'),
-        identifier: document.getElementById('meta-identifier')
+        identifier: document.getElementById('meta-identifier'),
+        fileSize: document.getElementById('meta-filesize')
     };
     const metadataMore = document.getElementById('metadataMore');
     const metadataPropertiesList = document.getElementById('meta-properties');
@@ -32,6 +33,51 @@
         warning: '⚠️',
         error: '❌'
     };
+
+    function formatBytes(bytes) {
+        if (!Number.isFinite(bytes)) return '—';
+        const thresh = 1024;
+        if (Math.abs(bytes) < thresh) {
+            return `${bytes} B`;
+        }
+        const units = ['KB', 'MB', 'GB', 'TB'];
+        let u = -1;
+        let value = bytes;
+        do {
+            value /= thresh;
+            u += 1;
+        } while (Math.abs(value) >= thresh && u < units.length - 1);
+        return `${value.toFixed(value < 10 ? 2 : value < 100 ? 1 : 0)} ${units[u]}`;
+    }
+
+    function renderPageTitles(titles) {
+        const item = document.getElementById('check-pages');
+        if (!item) return;
+        const container = item.querySelector('div');
+        if (!container) return;
+        const existing = item.querySelector('.pages-collapsible');
+        if (existing) existing.remove();
+        if (!titles || titles.length === 0) return;
+
+        const details = document.createElement('details');
+        details.className = 'pages-collapsible';
+        details.open = false;
+
+        const summary = document.createElement('summary');
+        summary.textContent = `Show page titles (${titles.length})`;
+        details.appendChild(summary);
+
+        const list = document.createElement('ul');
+        list.className = 'pages-list';
+        titles.forEach((title) => {
+            const li = document.createElement('li');
+            li.textContent = title || '(untitled)';
+            list.appendChild(li);
+        });
+        details.appendChild(list);
+
+        container.appendChild(details);
+    }
 
     function clearMetadata() {
         if (metadataSection) {
@@ -79,6 +125,11 @@
                 details.style.display = 'none';
             }
         });
+        const pagesItem = document.getElementById('check-pages');
+        if (pagesItem) {
+            const extra = pagesItem.querySelector('.pages-collapsible');
+            if (extra) extra.remove();
+        }
     }
 
     function populateKeyValueList(container, entries) {
@@ -207,6 +258,13 @@
         resultsSection.hidden = false;
         fileNameElement.textContent = file.name;
         clearMetadata();
+        // Show file size immediately
+        if (metadataFields.fileSize) {
+            metadataFields.fileSize.textContent = formatBytes(file.size);
+        }
+        if (metadataSection) {
+            metadataSection.hidden = false;
+        }
         resetChecklist();
 
         let zip;
@@ -284,6 +342,13 @@
         if (metadata) {
             renderMetadata(metadata);
         }
+        // Ensure file size is shown even if no metadata
+        if (metadataFields.fileSize) {
+            metadataFields.fileSize.textContent = formatBytes(file.size);
+        }
+        if (metadataSection) {
+            metadataSection.hidden = false;
+        }
 
         if (manifestKind === 'legacy') {
             setChecklistStatus(
@@ -294,6 +359,7 @@
             const skippedMessage = 'Skipped: legacy eXeLearning manifests (contentv3.xml) do not expose modern navigation structures.';
             setChecklistStatus('check-nav-structures', 'warning', skippedMessage);
             setChecklistStatus('check-pages', 'warning', skippedMessage);
+            renderPageTitles([]);
             setChecklistStatus(
                 'check-structure',
                 'warning',
@@ -321,6 +387,16 @@
 
         const pagesResult = validator.checkPagePresence(xmlDoc);
         setChecklistStatus('check-pages', pagesResult.status, pagesResult.message);
+        if (pagesResult.status === 'success' && typeof validator.extractPageTitles === 'function') {
+            try {
+                const titles = validator.extractPageTitles(xmlDoc);
+                renderPageTitles(Array.isArray(titles) ? titles : []);
+            } catch (_) {
+                renderPageTitles([]);
+            }
+        } else {
+            renderPageTitles([]);
+        }
 
         const structureResult = validator.validateStructuralIntegrity(xmlDoc);
         setChecklistStatus('check-structure', structureResult.status, structureResult.message);

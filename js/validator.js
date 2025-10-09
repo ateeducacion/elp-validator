@@ -71,6 +71,21 @@
         return { status: 'success', message: `Found ${pages.length} page${pages.length === 1 ? '' : 's'}.` };
     }
 
+    function extractPageTitles(xmlDoc) {
+        if (!xmlDoc) {
+            return [];
+        }
+        const navStructures = Array.from(xmlDoc.getElementsByTagName('odeNavStructure'));
+        return navStructures.map((nav) => {
+            const nameNode = nav.getElementsByTagName('pageName')[0];
+            const idNode = nav.getElementsByTagName('odePageId')[0];
+            const title = nameNode && nameNode.textContent ? nameNode.textContent.trim() : '';
+            if (title) return title;
+            const fallback = idNode && idNode.textContent ? idNode.textContent.trim() : '';
+            return fallback || '(untitled)';
+        });
+    }
+
     function formatRequirement(requirement) {
         return Array.isArray(requirement) ? requirement.join(' / ') : requirement;
     }
@@ -394,6 +409,7 @@
         normalizeResourcePath,
         extractMetadata,
         extractLegacyMetadata,
-        normalizeLegacyMetadata
+        normalizeLegacyMetadata,
+        extractPageTitles
     };
 });

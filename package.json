@@ -11,8 +11,8 @@
     "ELP",
     "JSZip"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Área de Tecnología Educativa",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "jest": "^29.7.0"
   }

@@ -322,4 +322,36 @@ main {
     .check-item .icon {
         margin: 0;
     }
+
+    /* Scale GitHub ribbon on mobile */
+    .github-ribbon img {
+        width: 110px;
+        height: auto;
+    }
+}
+
+/* GitHub ribbon (top-right) */
+.github-ribbon {
+    position: fixed;
+    top: 0;
+    right: 0;
+    border: 0;
+    z-index: 1000;
+}
+
+/* Pages list (collapsible under "Checking for pages") */
+.pages-collapsible {
+    margin-top: 0.5rem;
+}
+.pages-collapsible summary {
+    cursor: pointer;
+    color: var(--color-pending);
+    font-weight: 600;
+}
+.pages-list {
+    margin: 0.5rem 0 0;
+    padding-left: 1.15rem;
+}
+.pages-list li {
+    margin: 0.15rem 0;
 }
