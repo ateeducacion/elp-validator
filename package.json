@@ -1,0 +1,19 @@
+{
+  "name": "elp-validator",
+  "version": "1.0.0",
+  "description": "Client-side validator for eXeLearning .elp packages",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "eXeLearning",
+    "validator",
+    "ELP",
+    "JSZip"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

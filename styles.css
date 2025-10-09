@@ -1,0 +1,325 @@
+:root {
+    --color-background: #f5f7fb;
+    --color-surface: #ffffff;
+    --color-border: #d8deea;
+    --color-text: #1f2933;
+    --color-muted: #6b7280;
+    --color-success: #16a34a;
+    --color-error: #dc2626;
+    --color-warning: #d97706;
+    --color-pending: #6366f1;
+    --shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--color-background);
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main {
+    width: min(900px, 100%);
+    padding: 0 1.5rem 3rem;
+}
+
+.app-header {
+    width: min(900px, 100%);
+    padding: 2.5rem 1.5rem 1rem;
+    text-align: center;
+}
+
+.app-header h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.app-header p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 1rem;
+}
+
+.card {
+    background: var(--color-surface);
+    border-radius: 24px;
+    padding: 2.25rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.dropzone {
+    border: 2px dashed var(--color-border);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: rgba(99, 102, 241, 0.04);
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+    outline: none;
+}
+
+.dropzone:focus-visible {
+    border-color: var(--color-pending);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+.dropzone.dragover {
+    border-color: var(--color-pending);
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+}
+
+.dropzone-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.dropzone-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.dropzone-subtitle {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+}
+
+.results-intro {
+    margin-top: 0;
+    color: var(--color-muted);
+}
+
+.metadata {
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    border-radius: 18px;
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.metadata h3 {
+    margin: 0 0 1rem;
+    font-size: 1.15rem;
+}
+
+.metadata-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.metadata-table th {
+    text-align: left;
+    padding: 0.35rem 0;
+    color: var(--color-muted);
+    font-weight: 600;
+    width: 160px;
+}
+
+.metadata-table td {
+    padding: 0.35rem 0;
+    word-break: break-word;
+}
+
+.metadata-more {
+    margin-top: 1rem;
+}
+
+.metadata-more summary {
+    cursor: pointer;
+    color: var(--color-pending);
+    font-weight: 600;
+    outline: none;
+}
+
+.metadata-more summary::marker {
+    color: var(--color-pending);
+}
+
+.metadata-more-content {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .metadata-more-content {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.metadata-more-section h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.metadata-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.metadata-list li {
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.metadata-list code {
+    background: rgba(99, 102, 241, 0.15);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.85rem;
+}
+
+.metadata-value {
+    color: var(--color-text);
+    white-space: pre-wrap;
+}
+
+.file-name {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+}
+
+.check-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem 1.25rem;
+    border-radius: 16px;
+    border: 1px solid transparent;
+    background: rgba(148, 163, 184, 0.08);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.check-item .icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-top: 0.2rem;
+}
+
+.check-item .label {
+    display: block;
+    font-weight: 600;
+}
+
+.check-item .details {
+    margin: 0.35rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    display: none;
+}
+
+.check-item.success {
+    border-color: rgba(22, 163, 74, 0.2);
+    background: rgba(22, 163, 74, 0.08);
+}
+
+.check-item.success .icon {
+    color: var(--color-success);
+}
+
+.check-item.success .details {
+    display: block;
+    color: var(--color-success);
+}
+
+.check-item.error {
+    border-color: rgba(220, 38, 38, 0.2);
+    background: rgba(220, 38, 38, 0.08);
+}
+
+.check-item.error .icon {
+    color: var(--color-error);
+}
+
+.check-item.error .details {
+    display: block;
+    color: var(--color-error);
+}
+
+.check-item.warning {
+    border-color: rgba(217, 119, 6, 0.2);
+    background: rgba(217, 119, 6, 0.08);
+}
+
+.check-item.warning .icon {
+    color: var(--color-warning);
+}
+
+.check-item.warning .details {
+    display: block;
+    color: var(--color-warning);
+}
+
+.check-item.pending .icon {
+    color: var(--color-pending);
+}
+
+.app-footer {
+    width: 100%;
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+.app-footer .small-print {
+    margin-top: 0.4rem;
+}
+
+.app-footer .credits {
+    margin-top: 0.6rem;
+    font-weight: 500;
+}
+
+.app-footer .credits a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+}
+
+@media (max-width: 640px) {
+    .card {
+        padding: 1.75rem;
+    }
+
+    .check-item {
+        grid-template-columns: 1fr;
+    }
+
+    .check-item .icon {
+        margin: 0;
+    }
+}
