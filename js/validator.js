@@ -23,7 +23,10 @@
         const parserError = xmlDoc.querySelector('parsererror');
 
         if (parserError) {
-            const message = parserError.textContent || 'The XML document is not well-formed.';
+            const detail = (parserError.textContent || '').trim();
+            const message = detail
+                ? `The XML document is not well-formed: ${detail}`
+                : 'The XML document is not well-formed.';
             return { status: 'error', message };
         }
 

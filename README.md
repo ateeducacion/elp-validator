@@ -32,6 +32,18 @@ npm test
 
 Tests focus on the reusable validation helpers that power the UI.
 
+### Run a local server (debug)
+
+You can serve the static files with a tiny built-in dev server for easier debugging (auto MIME types, no caching):
+
+```bash
+npm run start
+```
+
+By default it listens on `http://localhost:8081`.
+
+Then open the printed URL in your browser and drag an `.elp` or `.zip` file onto the page.
+
 ## Project Structure
 
 ```
@@ -42,6 +54,3 @@ js/app.js         # UI glue code
 tests/            # Jest unit tests
 ```
 
-## License
-
-MIT
