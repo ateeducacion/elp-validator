@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eXeLearning Package Validator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <h1>eXeLearning Package Validator</h1>
+        <p>Validate the structure of your <code>.elp</code> projects directly in your browser.</p>
+    </header>
+
+    <main>
+        <section id="upload" class="card">
+            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload .elp or .zip file">
+                <div class="dropzone-icon" aria-hidden="true">📁</div>
+                <p class="dropzone-title">Drag &amp; drop your <strong>.elp</strong> or <strong>.zip</strong> file here</p>
+                <p class="dropzone-subtitle">or click to choose a file from your device</p>
+                <input id="fileInput" type="file" accept=".elp,.zip" hidden>
+            </div>
+        </section>
+
+        <section id="results" class="card results" hidden>
+            <h2 id="fileName" class="file-name"></h2>
+            <p class="results-intro">Validation results:</p>
+            <ul id="checklist" class="checklist">
+                <li id="check-zip" class="check-item pending" data-label="Verifying ZIP archive integrity">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Verifying ZIP archive integrity...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-content-xml" class="check-item pending" data-label="Looking for 'content.xml'">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Looking for <code>content.xml</code>...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-folders" class="check-item pending" data-label="Checking recommended resource folders">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Checking recommended resource folders...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-xml-well-formed" class="check-item pending" data-label="Validating XML syntax">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Validating <code>content.xml</code> syntax...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-root-element" class="check-item pending" data-label="Checking root element">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Checking root element...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-nav-structures" class="check-item pending" data-label="Looking for navigation structure">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Verifying navigation structures...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-pages" class="check-item pending" data-label="Checking for pages">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Checking for pages...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-structure" class="check-item pending" data-label="Validating internal structure">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Validating internal structure...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+                <li id="check-resources" class="check-item pending" data-label="Checking linked resources">
+                    <span class="icon" aria-hidden="true">⏳</span>
+                    <div>
+                        <span class="label">Checking linked resources...</span>
+                        <p class="details" role="alert"></p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>All processing happens in your browser. No files are uploaded to a server.</p>
+        <p class="small-print">Built with JSZip and vanilla JavaScript.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-R8/G2s+qsSVqSdz+CA0nVddOZXS6jttuPAHyBs+K6TfGsDzpDHK5vVsQt1zArhcXd1LSeX776BF3nf6/Dr7fWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/validator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
