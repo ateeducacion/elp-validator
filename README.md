@@ -1,10 +1,10 @@
 # eXeLearning Package Validator
 
-A client-side web application that inspects `.elp` (ZIP) packages exported from [eXeLearning](https://exelearning.net) and highlights common structural issues before publishing.
+A client-side web application that inspects `.elp` and `.elpx` (ZIP) packages exported from [eXeLearning](https://exelearning.net) and highlights common structural issues before publishing.
 
 ## Features
 
-- Drag-and-drop interface for `.elp` or `.zip` archives.
+- Drag-and-drop interface for `.elp`, `.elpx`, or `.zip` archives.
 - In-browser decompression using [JSZip](https://stuk.github.io/jszip/).
 - Sequential checklist that validates:
   - Archive integrity and presence of the manifest (`content.xml` or legacy `contentv3.xml`).
@@ -18,7 +18,7 @@ A client-side web application that inspects `.elp` (ZIP) packages exported from 
 ## Getting Started
 
 1. Open `index.html` in a modern browser. No build step is required.
-2. Drop an `.elp` file onto the drop zone or click it to choose a file.
+2. Drop an `.elp`, `.elpx`, or `.zip` file onto the drop zone or click it to choose a file.
 3. Review the validation checklist to understand any warnings or errors.
 
 ## Development
@@ -42,7 +42,7 @@ npm run start
 
 By default it listens on `http://localhost:8081`.
 
-Then open the printed URL in your browser and drag an `.elp` or `.zip` file onto the page.
+Then open the printed URL in your browser and drag an `.elp`, `.elpx`, or `.zip` file onto the page.
 
 ## Project Structure
 
@@ -53,4 +53,3 @@ js/validator.js   # Shared validation helpers (browser + Jest)
 js/app.js         # UI glue code
 tests/            # Jest unit tests
 ```
-
